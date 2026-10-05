@@ -1052,7 +1052,7 @@ components:
           type: array
           items:
             type: string
-        player_restrictions:
+        uuid_restrictions:
           type: array
           items:
             type: string
@@ -1089,7 +1089,7 @@ components:
           uniqueItems: true
           items:
             type: string
-        player_restrictions:
+        uuid_restrictions:
           type: array
           uniqueItems: true
           items:
@@ -1130,7 +1130,7 @@ components:
           uniqueItems: true
           items:
             type: string
-        player_restrictions:
+        uuid_restrictions:
           type: array
           uniqueItems: true
           items:
