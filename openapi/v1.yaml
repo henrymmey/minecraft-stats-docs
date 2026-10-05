@@ -1076,6 +1076,9 @@ components:
           type: string
           minLength: 1
           maxLength: 100
+        type:
+          type: string
+          enum: [client, website, integration]
         description:
           type: string
           maxLength: 500
