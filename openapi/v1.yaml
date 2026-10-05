@@ -1,0 +1,828 @@
+openapi: 3.1.0
+info:
+  title: Minecraft Stats API
+  version: 1.0.0
+  description: |
+    Version 1 REST API for the Minecraft Stats Platform.
+    Client ingestion uses scoped Bearer API keys. Administrative browser
+    authentication is handled by the server through OIDC and is not exposed
+    as an API token contract here.
+servers:
+  - url: https://stats.example.com
+    description: Example deployment
+
+tags:
+  - name: Health
+  - name: Ingest
+  - name: Public
+  - name: Admin
+
+paths:
+  /health/live:
+    get:
+      tags: [Health]
+      operationId: healthLive
+      security: []
+      responses:
+        "200":
+          description: Process is alive
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+
+  /health/ready:
+    get:
+      tags: [Health]
+      operationId: healthReady
+      security: []
+      responses:
+        "200":
+          description: Service is ready
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+        "503":
+          description: Service is not ready
+
+  /api/v1/ingest/batch:
+    post:
+      tags: [Ingest]
+      operationId: ingestBatch
+      security:
+        - bearerAuth: [ingest:write]
+      parameters:
+        - $ref: "#/components/parameters/RequestId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IngestBatchRequest"
+      responses:
+        "200":
+          description: Batch accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IngestBatchResponse"
+        "400":
+          $ref: "#/components/responses/InvalidPayload"
+        "401":
+          $ref: "#/components/responses/InvalidApiKey"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/v1/players:
+    get:
+      tags: [Public]
+      operationId: listPlayers
+      security:
+        - bearerAuth: [players:read]
+      parameters:
+        - name: season
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+            maxLength: 64
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+      responses:
+        "200":
+          description: Players
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedPlayers"
+        "401":
+          $ref: "#/components/responses/InvalidApiKey"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/v1/players/{player}:
+    get:
+      tags: [Public]
+      operationId: getPlayer
+      security:
+        - bearerAuth: [players:read]
+      parameters:
+        - $ref: "#/components/parameters/PlayerId"
+      responses:
+        "200":
+          description: Player
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Player"
+        "401":
+          $ref: "#/components/responses/InvalidApiKey"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/players/{player}/stats:
+    get:
+      tags: [Public]
+      operationId: getPlayerStats
+      security:
+        - bearerAuth: [stats:read]
+      parameters:
+        - $ref: "#/components/parameters/PlayerId"
+        - name: season
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Current player statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlayerStatsResponse"
+        "401":
+          $ref: "#/components/responses/InvalidApiKey"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/leaderboards:
+    get:
+      tags: [Public]
+      operationId: listLeaderboards
+      security:
+        - bearerAuth: [leaderboards:read]
+      parameters:
+        - name: season
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: stat
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        "200":
+          description: Leaderboard
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LeaderboardResponse"
+        "401":
+          $ref: "#/components/responses/InvalidApiKey"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/v1/online:
+    get:
+      tags: [Public]
+      operationId: getOnlinePlayers
+      security:
+        - bearerAuth: [presence:read]
+      responses:
+        "200":
+          description: Online players
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PlayerPresence"
+        "401":
+          $ref: "#/components/responses/InvalidApiKey"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/v1/seasons:
+    get:
+      tags: [Public]
+      operationId: listSeasons
+      security:
+        - bearerAuth: [stats:read]
+      responses:
+        "200":
+          description: Seasons
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Season"
+        "401":
+          $ref: "#/components/responses/InvalidApiKey"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/v1/admin/me:
+    get:
+      tags: [Admin]
+      operationId: adminMe
+      security:
+        - sessionCookie: []
+      responses:
+        "200":
+          description: Current administrator
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUser"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+
+  /api/v1/admin/api-keys:
+    get:
+      tags: [Admin]
+      operationId: listApiKeys
+      security:
+        - sessionCookie: []
+      responses:
+        "200":
+          description: API keys without raw secrets
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ApiKey"
+    post:
+      tags: [Admin]
+      operationId: createApiKey
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateApiKeyRequest"
+      responses:
+        "201":
+          description: Key created. The secret is returned only in this response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateApiKeyResponse"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/v1/admin/api-keys/{key}/rotate:
+    post:
+      tags: [Admin]
+      operationId: rotateApiKey
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: "#/components/parameters/ApiKeyId"
+      responses:
+        "200":
+          description: New key secret. Returned only once.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateApiKeyResponse"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/admin/api-keys/{key}/revoke:
+    post:
+      tags: [Admin]
+      operationId: revokeApiKey
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: "#/components/parameters/ApiKeyId"
+      responses:
+        "204":
+          description: Key revoked
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: MinecraftStatsApiKey
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: minecraft_stats_session
+
+  parameters:
+    RequestId:
+      name: X-Request-ID
+      in: header
+      required: false
+      schema:
+        type: string
+        maxLength: 128
+    PlayerId:
+      name: player
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ApiKeyId:
+      name: key
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  responses:
+    InvalidApiKey:
+      description: API key missing, invalid, expired or revoked
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Forbidden:
+      description: Authorization failed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Unauthenticated:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    InvalidPayload:
+      description: Payload validation failed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Conflict:
+      description: Request conflicts with current state
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    RateLimited:
+      description: Rate limit exceeded
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [ok]
+
+    IngestBatchRequest:
+      type: object
+      required: [protocol_version, client, player, server, session_id, observed_at]
+      properties:
+        protocol_version:
+          type: integer
+          enum: [1]
+        client:
+          $ref: "#/components/schemas/ClientInfo"
+        player:
+          $ref: "#/components/schemas/IngestPlayer"
+        server:
+          $ref: "#/components/schemas/ServerReference"
+        season:
+          type: string
+          nullable: true
+          description: Optional season slug/name hint. The server remains authoritative.
+        session_id:
+          type: string
+          format: uuid
+        observed_at:
+          type: string
+          format: date-time
+        stats:
+          type: array
+          maxItems: 500
+          items:
+            $ref: "#/components/schemas/StatObservation"
+        events:
+          type: array
+          maxItems: 100
+          items:
+            $ref: "#/components/schemas/ClientEvent"
+
+    ClientInfo:
+      type: object
+      required: [mod_version, minecraft_version]
+      properties:
+        mod_version:
+          type: string
+          maxLength: 64
+        minecraft_version:
+          type: string
+          maxLength: 64
+        fabric_loader_version:
+          type: string
+          maxLength: 64
+          nullable: true
+
+    IngestPlayer:
+      type: object
+      required: [uuid, username]
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        username:
+          type: string
+          minLength: 1
+          maxLength: 16
+
+    ServerReference:
+      type: object
+      required: [hostname, port]
+      properties:
+        hostname:
+          type: string
+          minLength: 1
+          maxLength: 253
+        port:
+          type: integer
+          minimum: 1
+          maximum: 65535
+
+    StatObservation:
+      type: object
+      required: [key, value]
+      properties:
+        key:
+          type: string
+          minLength: 1
+          maxLength: 255
+        value:
+          type: integer
+          format: int64
+          minimum: 0
+
+    ClientEvent:
+      type: object
+      required: [id, type, occurred_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          minLength: 1
+          maxLength: 64
+        occurred_at:
+          type: string
+          format: date-time
+        payload:
+          type: object
+          additionalProperties: true
+
+    IngestBatchResponse:
+      type: object
+      required: [accepted, request_id, server_time]
+      properties:
+        accepted:
+          type: boolean
+          const: true
+        request_id:
+          type: string
+        server_time:
+          type: string
+          format: date-time
+        next_upload_after:
+          type: integer
+          minimum: 1
+
+    Player:
+      type: object
+      required: [id, uuid, username]
+      properties:
+        id:
+          type: string
+          format: uuid
+        uuid:
+          type: string
+          format: uuid
+        username:
+          type: string
+        public:
+          type: boolean
+
+    PaginatedPlayers:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Player"
+        meta:
+          $ref: "#/components/schemas/Pagination"
+
+    Pagination:
+      type: object
+      required: [current_page, per_page, total]
+      properties:
+        current_page:
+          type: integer
+        per_page:
+          type: integer
+        total:
+          type: integer
+
+    PlayerStatsResponse:
+      type: object
+      required: [player, season, stats]
+      properties:
+        player:
+          $ref: "#/components/schemas/Player"
+        season:
+          $ref: "#/components/schemas/Season"
+        stats:
+          type: array
+          items:
+            $ref: "#/components/schemas/StatValue"
+
+    StatValue:
+      type: object
+      required: [key, value, updated_at]
+      properties:
+        key:
+          type: string
+        value:
+          type: integer
+          format: int64
+        updated_at:
+          type: string
+          format: date-time
+
+    Season:
+      type: object
+      required: [id, name, slug, active]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        slug:
+          type: string
+        active:
+          type: boolean
+        started_at:
+          type: string
+          format: date-time
+          nullable: true
+        ended_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    LeaderboardResponse:
+      type: object
+      required: [season, stat, entries]
+      properties:
+        season:
+          $ref: "#/components/schemas/Season"
+        stat:
+          type: string
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/LeaderboardEntry"
+
+    LeaderboardEntry:
+      type: object
+      required: [rank, player, value]
+      properties:
+        rank:
+          type: integer
+        player:
+          $ref: "#/components/schemas/Player"
+        value:
+          type: integer
+          format: int64
+
+    PlayerPresence:
+      type: object
+      required: [player, online, last_seen_at]
+      properties:
+        player:
+          $ref: "#/components/schemas/Player"
+        online:
+          type: boolean
+        last_seen_at:
+          type: string
+          format: date-time
+
+    ApiKey:
+      type: object
+      required: [id, name, prefix, enabled, scopes, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        prefix:
+          type: string
+        description:
+          type: string
+          nullable: true
+        enabled:
+          type: boolean
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+        last_used_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        revoked_at:
+          type: string
+          format: date-time
+          nullable: true
+        scopes:
+          type: array
+          items:
+            type: string
+        player_restrictions:
+          type: array
+          items:
+            type: string
+            format: uuid
+        server_restrictions:
+          type: array
+          items:
+            type: string
+            format: uuid
+        season_restrictions:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    CreateApiKeyRequest:
+      type: object
+      required: [name, scopes]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+        scopes:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            type: string
+        player_restrictions:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            format: uuid
+        server_restrictions:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            format: uuid
+        season_restrictions:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            format: uuid
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    CreateApiKeyResponse:
+      type: object
+      required: [data, secret]
+      properties:
+        data:
+          $ref: "#/components/schemas/ApiKey"
+        secret:
+          type: string
+          description: Raw API secret. Returned only once.
+
+    AdminUser:
+      type: object
+      required: [id, display_name, memberships]
+      properties:
+        id:
+          type: string
+          format: uuid
+        display_name:
+          type: string
+        email:
+          type: string
+          format: email
+          nullable: true
+        memberships:
+          type: array
+          items:
+            type: object
+            required: [workspace_id, role]
+            properties:
+              workspace_id:
+                type: string
+                format: uuid
+              role:
+                type: string
+                enum: [owner, admin, analyst, readonly]
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message, request_id]
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            request_id:
+              type: string
