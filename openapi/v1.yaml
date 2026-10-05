@@ -18,7 +18,7 @@ tags:
   - name: Admin
 
 paths:
-  /health/live:
+  /api/v1/health/live:
     get:
       tags: [Health]
       operationId: healthLive
@@ -31,7 +31,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/HealthResponse"
 
-  /health/ready:
+  /api/v1/health/ready:
     get:
       tags: [Health]
       operationId: healthReady
@@ -389,6 +389,275 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  /api/v1/setup/bootstrap:
+    post:
+      tags: [Admin]
+      operationId: bootstrapWorkspace
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token]
+              properties:
+                token:
+                  type: string
+                  minLength: 20
+                  maxLength: 300
+      responses:
+        "201":
+          description: Workspace initialized
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [workspace_id, role]
+                    properties:
+                      workspace_id:
+                        type: string
+                        format: uuid
+                      role:
+                        type: string
+                        const: owner
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "422":
+          $ref: "#/components/responses/InvalidPayload"
+
+  /api/v1/admin/players:
+    get:
+      tags: [Admin]
+      operationId: adminListPlayers
+      security:
+        - sessionCookie: []
+      responses:
+        "200":
+          description: Workspace players
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/AdminPlayer"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/v1/admin/servers:
+    get:
+      tags: [Admin]
+      operationId: adminListServers
+      security:
+        - sessionCookie: []
+      responses:
+        "200":
+          description: Servers
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Server"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [Admin]
+      operationId: adminCreateServer
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateServerRequest"
+      responses:
+        "201":
+          description: Server created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Server"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "422":
+          $ref: "#/components/responses/InvalidPayload"
+
+  /api/v1/admin/servers/{server}:
+    put:
+      tags: [Admin]
+      operationId: adminUpdateServer
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: "#/components/parameters/ServerId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateServerRequest"
+      responses:
+        "200":
+          description: Updated server
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Server"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/admin/seasons:
+    get:
+      tags: [Admin]
+      operationId: adminListSeasons
+      security:
+        - sessionCookie: []
+      responses:
+        "200":
+          description: Seasons
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Season"
+    post:
+      tags: [Admin]
+      operationId: adminCreateSeason
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSeasonRequest"
+      responses:
+        "201":
+          description: Season created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Season"
+
+  /api/v1/admin/seasons/{season}/activate:
+    post:
+      tags: [Admin]
+      operationId: adminActivateSeason
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: "#/components/parameters/SeasonId"
+      responses:
+        "200":
+          description: Activated season
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Season"
+
+  /api/v1/admin/users:
+    get:
+      tags: [Admin]
+      operationId: adminListUsers
+      security:
+        - sessionCookie: []
+      responses:
+        "200":
+          description: Workspace administrators
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/AdminWorkspaceUser"
+
+  /api/v1/admin/users/{user}:
+    put:
+      tags: [Admin]
+      operationId: adminUpdateUserRole
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role]
+              properties:
+                role:
+                  type: string
+                  enum: [owner, admin, analyst, readonly]
+      responses:
+        "200":
+          description: Updated role
+
+  /api/v1/admin/audit-log:
+    get:
+      tags: [Admin]
+      operationId: adminAuditLog
+      security:
+        - sessionCookie: []
+      responses:
+        "200":
+          description: Audit log
+          content:
+            application/json:
+              schema:
+                type: object
+
 components:
   securitySchemes:
     bearerAuth:
@@ -410,6 +679,28 @@ components:
         maxLength: 128
     PlayerId:
       name: player
+      in: path
+      required: true
+      description: Minecraft player UUID
+      schema:
+        type: string
+        format: uuid
+    ServerId:
+      name: server
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    SeasonId:
+      name: season
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    UserId:
+      name: user
       in: path
       required: true
       schema:
@@ -892,6 +1183,99 @@ components:
           enum: [owner, admin, analyst, readonly]
         needs_bootstrap:
           type: boolean
+
+    AdminPlayer:
+      type: object
+      required: [id, minecraft_uuid, current_username, public, last_seen_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        minecraft_uuid:
+          type: string
+          format: uuid
+        current_username:
+          type: string
+        public:
+          type: boolean
+        last_seen_at:
+          type: string
+          format: date-time
+
+    Server:
+      type: object
+      required: [id, name, hostname, port, display_name, enabled]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        hostname:
+          type: string
+        port:
+          type: integer
+        display_name:
+          type: string
+        enabled:
+          type: boolean
+
+    CreateServerRequest:
+      type: object
+      required: [name, display_name, hostname, port]
+      properties:
+        name:
+          type: string
+        display_name:
+          type: string
+        hostname:
+          type: string
+        port:
+          type: integer
+          minimum: 1
+          maximum: 65535
+        enabled:
+          type: boolean
+
+    CreateSeasonRequest:
+      type: object
+      required: [name, slug]
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+          pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        started_at:
+          type: string
+          format: date-time
+          nullable: true
+        ended_at:
+          type: string
+          format: date-time
+          nullable: true
+        active:
+          type: boolean
+
+    AdminWorkspaceUser:
+      type: object
+      required: [id, display_name, role]
+      properties:
+        id:
+          type: string
+          format: uuid
+        display_name:
+          type: string
+        email:
+          type: string
+          nullable: true
+        role:
+          type: string
+          enum: [owner, admin, analyst, readonly]
+        last_login_at:
+          type: string
+          format: date-time
+          nullable: true
 
     ErrorResponse:
       type: object
