@@ -71,7 +71,7 @@ export default defineConfig({
       { icon: "github", link: "https://github.com/henrymmey/minecraft-stats-docs" }
     ],
     footer: {
-      message: '<a href="https://henrymeyer.de/legal/imprint">Imprint</a> &nbsp;&nbsp; <a href="https://henrymeyer.de/code-of-conduct">Code of Conduct</a><br><br>NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.<br><br>© 2026 Henry Meyer.<br><br>Code licensed under MIT • Content under CC BY 4.0 • Icons & Logos All Rights Reserved.',
+      message: '<a href="https://henrymeyer.de/legal/imprint">Imprint</a> &nbsp;&nbsp; <a href="https://henrymeyer.de/code-of-conduct">Code of Conduct</a><br>NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.<br>© 2026 Henry Meyer.<br>Code licensed under MIT • Content under CC BY 4.0 • Icons & Logos All Rights Reserved.',
       copyright: ""
     }
   }
