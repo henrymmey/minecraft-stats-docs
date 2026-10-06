@@ -93,7 +93,7 @@ After changing these variables:
 
 ```bash
 cd /opt/hm-stats
-docker compose up -d --force-recreate app
+docker compose up -d --force-recreate api
 ```
 
 ## Login flow
@@ -184,7 +184,7 @@ It must match exactly, including scheme, hostname, path and trailing slash behav
 Check:
 
 ```bash
-docker compose logs -f app
+docker compose logs -f api
 ```
 
 Also verify that `APP_URL`, `OIDC_ISSUER` and `OIDC_REDIRECT_URI` all describe the same production host.
