@@ -2,7 +2,7 @@
 layout: home
 
 hero:
-  name: Minecraft Stats Platform
+  name: HM Stats
   text: Client-side Minecraft telemetry, self-hosted.
   tagline: Open-source statistics collection for Fabric clients, REST APIs and community dashboards.
   actions:
