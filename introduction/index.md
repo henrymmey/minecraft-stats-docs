@@ -1,6 +1,6 @@
 # Introduction
 
-Minecraft Stats Platform is a generic open-source system for collecting Minecraft client statistics and exposing them through a self-hosted API.
+HM Stats is a generic open-source system for collecting Minecraft client statistics and exposing them through a self-hosted API.
 
 It consists of four repositories:
 
