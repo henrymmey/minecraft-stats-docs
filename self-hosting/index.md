@@ -1,28 +1,44 @@
 # Self-hosting
 
-The recommended deployment uses Docker Compose.
+Use the [complete installation guide](/installation/) for a fresh production deployment.
 
-Target services:
+This section covers the pieces most commonly changed after installation:
+
+- [Domain & HTTPS](/self-hosting/domain)
+- [OIDC administrator login](/self-hosting/oidc)
+- [Maintenance & backups](/self-hosting/maintenance)
+
+## Production topology
 
 ```
-Caddy
-  ├── Laravel API
-  ├── React Dashboard
-  └── PostgreSQL
+Internet
+  |
+  v
+Caddy / HTTPS
+  |------> Dashboard static files
+  |
+  +------> HM Stats Server :8000
+                |
+                v
+            PostgreSQL
 ```
 
-Production secrets belong in environment variables or Docker Secrets.
+Keep the application port private and do not expose PostgreSQL to the public internet.
 
-## First setup
+The current dashboard uses same-origin `/api/*` and `/auth/*` requests, so a single public hostname is the simplest supported deployment.
 
-1. Deploy the containers.
-2. Configure the database.
-3. Configure OIDC.
-4. Create a one-time bootstrap token with `php artisan stats:bootstrap-token`.
-5. Log in through OIDC.
-6. Consume the bootstrap token to become the initial workspace owner.
-7. Create a client API key.
-8. Register the Minecraft server and season.
-9. Give the client key the smallest possible player/server/season restrictions.
+## Server container
 
-Do not expose PostgreSQL directly to the public internet.
+The current server Dockerfile runs Laravel with PHP 8.5 and exposes port 8000 inside the deployment.
+
+The startup script runs database migrations before starting the application.
+
+## Development deployment
+
+For local development, the server repository also contains:
+
+```bash
+docker compose -f docker/compose.dev.yml up --build
+```
+
+That development stack uses HTTP on localhost and should not be copied to production unchanged.
