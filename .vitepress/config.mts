@@ -1,8 +1,8 @@
 import { defineConfig } from "vitepress";
 
 export default defineConfig({
-  title: "Minecraft Stats Platform",
-  description: "Documentation for the Minecraft Stats Platform",
+  title: "HM Stats",
+  description: "Documentation for the HM Stats",
   cleanUrls: true,
   themeConfig: {
     nav: [
@@ -48,7 +48,7 @@ export default defineConfig({
     ],
     footer: {
       message: "Released under the MIT License.",
-      copyright: "Minecraft Stats Platform contributors"
+      copyright: "HM Stats contributors"
     }
   }
 });
