@@ -22,6 +22,42 @@ https://stats.example.com/auth/callback
 
 Replace the hostname with your actual HM Stats hostname.
 
+## authentik
+
+authentik is a supported OIDC provider for HM Stats.
+
+In authentik:
+
+1. Open **Applications → Applications** and create a new application.
+2. Select **OAuth2/OIDC** as the provider type.
+3. Use the HM Stats callback URL exactly:
+   `https://stats.example.com/auth/callback`
+4. For a server-side HM Stats deployment, use a **confidential** client and copy the generated client secret.
+5. Make sure the provider allows the `openid`, `profile`, and `email` scopes.
+6. Use the provider's OIDC issuer/discovery URL as `OIDC_ISSUER`.
+
+The token endpoint of authentik supports confidential-client authentication with either `client_secret_basic` or `client_secret_post`. HM Stats defaults to `auto` and can use either method. Public clients using PKCE and no client secret are also supported.
+
+For a confidential authentik client, set:
+
+```dotenv
+OIDC_ISSUER=https://auth.example.com/application/o/<slug>/
+OIDC_CLIENT_ID=...
+OIDC_CLIENT_SECRET=...
+OIDC_REDIRECT_URI=https://stats.example.com/auth/callback
+OIDC_TOKEN_ENDPOINT_AUTH_METHOD=auto
+OIDC_REQUIRE_HTTPS=true
+```
+
+If the authentik provider is configured as a public client, set:
+
+```dotenv
+OIDC_TOKEN_ENDPOINT_AUTH_METHOD=none
+OIDC_CLIENT_SECRET=
+```
+
+Do not expose a client secret in the dashboard or frontend.
+
 ## Requested scopes
 
 HM Stats requests:
