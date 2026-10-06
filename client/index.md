@@ -1,29 +1,42 @@
-# Fabric Client
+# Client
 
-The client is a physical-client-only Fabric mod. Fabric's `client` entrypoint is used so it is not loaded on dedicated servers.
+The HM Stats Client is a **client-side Fabric mod**. Each participating player installs it locally.
 
-## Configuration
+The Minecraft server itself does not need the mod.
 
-The client stores its configuration under the Minecraft config directory:
+## Compatibility
+
+Current target:
+
+- Minecraft **26.2**
+- Java **25**
+- Fabric Loader **0.19.3 or newer**
+- Fabric API compatible with Minecraft 26.2
+
+## Install
+
+Install Fabric for Minecraft 26.2, install a compatible Fabric API, then place the HM Stats JAR in the Fabric instance's `mods` directory.
+
+The current CI workflow uploads a build artifact named `hm-stats-client`. Automatic Modrinth/CurseForge publishing is not configured yet.
+
+## Configure
+
+The configuration file is:
 
 ```
-config/minecraft-stats.json
+.minecraft/config/hm-stats.json
 ```
 
-Example:
+The client creates it automatically on first launch.
 
-```json
-{
-  "enabled": true,
-  "api": {
-    "url": "https://stats.example.com",
-    "key": "mst_client_..."
-  }
-}
-```
+Use the full [Client installation and configuration](/client/configuration) guide for API URL/key setup, restrictions, privacy settings, upload intervals, retries and queue handling.
 
-Never commit a real API key.
+## Data model
 
-See the repository protocol specification:
+Protocol v1 sends player identity, observed server, session/timestamps, absolute statistic observations and client events.
 
-https://github.com/henrymmey/minecraft-stats-client/blob/main/PROTOCOL.md
+It does not send chat, coordinates, screenshots, files or private messages.
+
+## Troubleshooting
+
+When something is not uploaded, start with [Client troubleshooting](/client/troubleshooting).
