@@ -3,21 +3,40 @@ layout: home
 
 hero:
   name: HM Stats
-  text: Client-side Minecraft telemetry, self-hosted.
-  tagline: Open-source statistics collection for Fabric clients, REST APIs and community dashboards.
+  text: Self-hosted Minecraft statistics for clans and communities.
+  tagline: A practical guide for installing the server, connecting your domain, configuring the dashboard, and installing the client.
   actions:
     - theme: brand
-      text: Get Started
-      link: /introduction/
+      text: Install HM Stats
+      link: /installation/
     - theme: alt
-      text: Self-hosting
-      link: /self-hosting/
+      text: Dashboard Guide
+      link: /dashboard/
+    - theme: alt
+      text: API Reference
+      link: /api/
 
 features:
-  - title: Client-side
-    details: Collect supported Minecraft statistics without installing anything on a public server.
+  - title: Clan-admin focused
+    details: Follow the installation from an empty Linux server to a working dashboard and connected Minecraft clients.
+  - title: Client-side Fabric mod
+    details: Players install the HM Stats client locally; the Minecraft server itself does not need the mod.
   - title: Self-hosted
-    details: Run the API, dashboard and PostgreSQL yourself with Docker Compose.
+    details: Keep PostgreSQL, the API and dashboard under your own infrastructure and domain.
+  - title: Scoped API keys
+    details: Separate client ingestion keys from website/integration read keys and restrict them to players, servers and seasons.
+  - title: HTTPS + OIDC
+    details: Use a real domain, TLS and OpenID Connect for administrator authentication.
   - title: Open API
-    details: Integrate clan and community websites using the versioned REST API.
+    details: Integrate your own clan website or tools with the versioned REST API and OpenAPI specification.
 ---
+
+## Start here
+
+**New installation:** [Installation guide](/installation/)
+
+**Already installed:** [Dashboard guide](/dashboard/) · [Client guide](/client/) · [API reference](/api/)
+
+> **Current release note:** the HM Stats client targets **Minecraft 26.2**, Java 25 and Fabric Loader 0.19.3 or newer.
+
+The documentation is written primarily for clan and community administrators. Developer notes are kept separate under [Development](/development/).
