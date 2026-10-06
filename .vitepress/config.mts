@@ -2,45 +2,69 @@ import { defineConfig } from "vitepress";
 
 export default defineConfig({
   title: "HM Stats",
-  description: "Documentation for the HM Stats",
+  description: "Operator documentation for HM Stats",
   cleanUrls: true,
   themeConfig: {
     nav: [
-      { text: "Guide", link: "/introduction/" },
+      { text: "Get started", link: "/installation/" },
+      { text: "Dashboard", link: "/dashboard/" },
+      { text: "Client", link: "/client/configuration" },
       { text: "API", link: "/api/" },
-      { text: "Self-hosting", link: "/self-hosting/" },
-      { text: "GitHub", link: "https://github.com/henrymmey/minecraft-stats-server" }
+      { text: "GitHub", link: "https://github.com/henrymmey/minecraft-stats-docs" }
     ],
     sidebar: [
       {
-        text: "Introduction",
+        text: "Start here",
         items: [
-          { text: "Overview", link: "/introduction/" }
+          { text: "Overview", link: "/introduction/" },
+          { text: "Installation", link: "/installation/" }
         ]
       },
       {
-        text: "Client",
-        items: [{ text: "Fabric Client", link: "/client/" }]
-      },
-      {
-        text: "Server",
-        items: [{ text: "Server", link: "/server/" }]
-      },
-      {
         text: "Self-hosting",
-        items: [{ text: "Deployment", link: "/self-hosting/" }]
+        items: [
+          { text: "Installation", link: "/installation/" },
+          { text: "Domain & HTTPS", link: "/self-hosting/domain" },
+          { text: "OIDC administrator login", link: "/self-hosting/oidc" },
+          { text: "Maintenance & backups", link: "/self-hosting/maintenance" }
+        ]
       },
       {
-        text: "Security",
-        items: [{ text: "Security Model", link: "/security/" }]
+        text: "Dashboard",
+        items: [
+          { text: "Dashboard guide", link: "/dashboard/" },
+          { text: "API keys", link: "/dashboard/api-keys" },
+          { text: "Servers & seasons", link: "/dashboard/servers-seasons" }
+        ]
+      },
+      {
+        text: "Minecraft client",
+        items: [
+          { text: "Client overview", link: "/client/" },
+          { text: "Installation & configuration", link: "/client/configuration" },
+          { text: "Troubleshooting", link: "/client/troubleshooting" }
+        ]
       },
       {
         text: "API",
-        items: [{ text: "Reference", link: "/api/" }]
+        items: [
+          { text: "API overview", link: "/api/" },
+          { text: "Endpoint reference", link: "/api/endpoints" }
+        ]
       },
       {
-        text: "Development",
-        items: [{ text: "Development", link: "/development/" }]
+        text: "Operations & security",
+        items: [
+          { text: "Security", link: "/security/" },
+          { text: "Troubleshooting", link: "/troubleshooting/" }
+        ]
+      },
+      {
+        text: "Developer",
+        collapsed: true,
+        items: [
+          { text: "Development", link: "/development/" }
+        ]
       }
     ],
     socialLinks: [
