@@ -1,0 +1,37 @@
+.HMFooter {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 20px 24px 26px;
+  text-align: center;
+  color: var(--vp-c-text-2);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.HMFooter__links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.HMFooter__links a {
+  color: inherit;
+}
+
+.HMFooter__notices {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+@media (max-width: 640px) {
+  .HMFooter {
+    padding-inline: 16px;
+  }
+
+  .HMFooter__notices {
+    overflow-wrap: anywhere;
+  }
+}
