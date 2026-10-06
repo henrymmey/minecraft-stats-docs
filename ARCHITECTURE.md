@@ -2,7 +2,7 @@
 
 ## Product model
 
-Minecraft Stats is a self-hostable multi-workspace platform.
+HM Stats is a self-hostable multi-workspace platform.
 
 A workspace is an independent dataset and security boundary. HMT is one possible workspace, not a hardcoded special case.
 
