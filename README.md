@@ -1,6 +1,6 @@
-# Minecraft Stats Documentation
+# HM Stats Documentation
 
-Public documentation and API contract for the Minecraft Stats Platform.
+Public documentation and API contract for the HM Stats.
 
 ## Documentation responsibilities
 
