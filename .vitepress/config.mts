@@ -71,8 +71,8 @@ export default defineConfig({
       { icon: "github", link: "https://github.com/henrymmey/minecraft-stats-docs" }
     ],
     footer: {
-      message: "Released under the MIT License.",
-      copyright: "HM Stats contributors"
+      message: "NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.<br><br>© 2026 Henry Meyer.<br><br>Code licensed under MIT • Content under CC BY 4.0 • Icons & Logos All Rights Reserved.",
+      copyright: 'Imprint: <a href="https://henrymeyer.de/legal/imprint">henrymeyer.de/legal/imprint</a> • Code of Conduct: <a href="https://henrymeyer.de/code-of-conduct">henrymeyer.de/code-of-conduct</a>'
     }
   }
 });
