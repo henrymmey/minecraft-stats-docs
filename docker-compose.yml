@@ -1,6 +1,6 @@
 services:
   api:
-    image: ghcr.io/henrymmey/minecraft-stats-server:latest
+    image: ghcr.io/henrymmey/hm-stats-server:latest
     restart: unless-stopped
     environment:
       APP_ENV: production
@@ -27,7 +27,7 @@ services:
         condition: service_healthy
 
   dashboard:
-    image: ghcr.io/henrymmey/minecraft-stats-dashboard:latest
+    image: ghcr.io/henrymmey/hm-stats-dashboard:latest
     restart: unless-stopped
     expose:
       - "80"
