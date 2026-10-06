@@ -23,6 +23,7 @@ services:
       OIDC_CLIENT_ID: ${OIDC_CLIENT_ID}
       OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
       OIDC_REDIRECT_URI: ${OIDC_REDIRECT_URI}
+      OIDC_TOKEN_ENDPOINT_AUTH_METHOD: ${OIDC_TOKEN_ENDPOINT_AUTH_METHOD:-auto}
       OIDC_REQUIRE_HTTPS: "true"
       API_KEY_PEPPER: ${API_KEY_PEPPER}
     expose:
@@ -59,6 +60,8 @@ services:
   caddy:
     image: caddy:2.10-alpine
     restart: unless-stopped
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN}
     ports:
       - "80:80"
       - "443:443"
